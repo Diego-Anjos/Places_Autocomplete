@@ -1,73 +1,110 @@
-# React + TypeScript + Vite
+# Places Autocomplete
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Componente de autocompletar de endereços construído com **React**, **TypeScript** e **Vite**, consumindo a API gratuita do [Nominatim (OpenStreetMap)](https://nominatim.openstreetmap.org/).
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Como funciona na prática
 
-## React Compiler
+### 1. O usuário digita no campo de endereço
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Ao digitar, o valor do input é atualizado em tempo real. Porém, **nenhuma requisição é feita ainda** — o hook `useDebounce` segura o valor e reinicia um timer de **500ms** a cada tecla pressionada.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+Usuário digita "Avenida Pau..."
+→ timer reinicia
+→ timer reinicia
+→ timer reinicia
+→ 500ms sem digitar → valor é liberado para a busca
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. O debounce libera a busca
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Após 500ms sem digitação, o valor debouncado chega ao hook `useNominatim`. Ele só inicia a requisição se o texto tiver **pelo menos 3 caracteres**.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. A requisição é feita à API do Nominatim
+
+O hook monta a URL com os parâmetros e faz um `fetch`:
+
 ```
+GET https://nominatim.openstreetmap.org/search?format=json&q=Avenida+Paulista&limit=7
+```
+
+Durante a requisição, o estado `isLoading` fica `true` e um **spinner** é exibido no input.
+
+### 4. O AbortController evita conflitos
+
+Se o usuário continuar digitando enquanto uma requisição está em andamento, a requisição anterior é **cancelada automaticamente** via `AbortController`. Isso garante que apenas o resultado da busca mais recente seja exibido, sem dados desatualizados aparecendo.
+
+### 5. O dropdown exibe as sugestões
+
+A API retorna uma lista de endereços. O componente exibe até **7 sugestões** em um dropdown animado abaixo do input, cada uma com ícone de localização e o endereço completo (`display_name`).
+
+Se nenhum endereço for encontrado, é exibida a mensagem: `"Nenhum endereço encontrado."`
+
+### 6. O usuário seleciona um endereço
+
+Ao clicar (ou pressionar `Enter`) em uma sugestão:
+- O input é preenchido com o endereço completo
+- O dropdown fecha
+- O callback `onSelect` é chamado com o objeto completo, incluindo **latitude** e **longitude**
+
+```ts
+onSelect={(result) => {
+  console.log(result.display_name) // "Avenida Paulista, São Paulo..."
+  console.log(result.lat)          // "-23.5614696"
+  console.log(result.lon)          // "-46.6558549"
+}}
+```
+
+---
+
+## Navegação por teclado
+
+| Tecla      | Ação                              |
+|------------|-----------------------------------|
+| `↓`        | Navega para a próxima sugestão    |
+| `↑`        | Navega para a sugestão anterior   |
+| `Enter`    | Seleciona a sugestão destacada    |
+| `Escape`   | Fecha o dropdown                  |
+
+---
+
+## Estrutura do projeto
+
+```
+src/
+├── hooks/
+│   ├── useDebounce.ts       # Atrasa o valor por 500ms
+│   └── useNominatim.ts      # Gerencia a chamada à API
+├── components/
+│   └── AddressAutocomplete/
+│       ├── AddressAutocomplete.tsx        # Componente visual
+│       ├── AddressAutocomplete.module.css # Estilos
+│       └── index.ts                       # Exportação
+├── App.tsx
+└── main.tsx
+```
+
+---
+
+## Como rodar localmente
+
+```bash
+# Instalar dependências
+npm install
+
+# Iniciar o servidor de desenvolvimento
+npm run dev
+```
+
+Acesse em: [http://localhost:5173](http://localhost:5173)
+
+---
+
+## Tecnologias utilizadas
+
+- [React 19](https://react.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/)
+- [Nominatim API](https://nominatim.org/release-docs/latest/api/Search/) — gratuita, sem chave de API
