@@ -1,8 +1,8 @@
 .wrapper {
   position: relative;
   width: 100%;
-  max-width: 560px;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: inherit;
+  z-index: 20;
 }
 
 .label {
@@ -10,7 +10,7 @@
   margin-bottom: 6px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: #cbd5e1;
   letter-spacing: 0.01em;
 }
 
@@ -26,7 +26,7 @@
   left: 14px;
   display: flex;
   align-items: center;
-  color: #9ca3af;
+  color: #94a3b8;
   pointer-events: none;
   z-index: 1;
 }
@@ -35,9 +35,9 @@
   width: 100%;
   padding: 12px 40px 12px 44px;
   font-size: 0.9375rem;
-  color: #111827;
-  background: #ffffff;
-  border: 1.5px solid #d1d5db;
+  color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid rgba(148, 163, 184, 0.28);
   border-radius: 10px;
   outline: none;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
@@ -45,12 +45,12 @@
 }
 
 .input::placeholder {
-  color: #9ca3af;
+  color: #64748b;
 }
 
 .input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
 }
 
 .clearButton {
@@ -63,16 +63,16 @@
   height: 24px;
   border: none;
   border-radius: 50%;
-  background: #e5e7eb;
-  color: #6b7280;
+  background: rgba(139, 92, 246, 0.25);
+  color: #c4b5fd;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
   padding: 0;
 }
 
 .clearButton:hover {
-  background: #d1d5db;
-  color: #374151;
+  background: rgba(139, 92, 246, 0.45);
+  color: #ede9fe;
 }
 
 /* ── Dropdown ── */
@@ -84,12 +84,14 @@
   list-style: none;
   margin: 0;
   padding: 6px 0;
-  background: #ffffff;
-  border: 1.5px solid #e5e7eb;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.35);
   border-radius: 10px;
   box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.07),
-    0 10px 20px -4px rgba(0, 0, 0, 0.1);
+    0 12px 32px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
   z-index: 1000;
   max-height: 320px;
   overflow-y: auto;
@@ -107,7 +109,6 @@
   }
 }
 
-/* Scrollbar styling */
 .dropdown::-webkit-scrollbar {
   width: 6px;
 }
@@ -115,7 +116,7 @@
   background: transparent;
 }
 .dropdown::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: rgba(139, 92, 246, 0.4);
   border-radius: 999px;
 }
 
@@ -131,18 +132,18 @@
 
 .option:hover,
 .optionActive {
-  background: #f5f3ff;
+  background: rgba(139, 92, 246, 0.18);
 }
 
 .optionIcon {
   flex-shrink: 0;
   margin-top: 2px;
-  color: #6366f1;
+  color: #a78bfa;
 }
 
 .optionText {
   font-size: 0.875rem;
-  color: #374151;
+  color: #e2e8f0;
   line-height: 1.45;
   word-break: break-word;
 }
@@ -154,7 +155,7 @@
   gap: 10px;
   padding: 12px 14px;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: #94a3b8;
 }
 
 /* ── Spinner ── */
@@ -162,8 +163,8 @@
   display: inline-block;
   width: 16px;
   height: 16px;
-  border: 2px solid #d1d5db;
-  border-top-color: #6366f1;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-top-color: #a78bfa;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;

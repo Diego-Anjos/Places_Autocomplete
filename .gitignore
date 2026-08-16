@@ -7,10 +7,16 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node modules (MUITO IMPORTANTE!)
 node_modules
 dist
 dist-ssr
 *.local
+
+# Env / secrets
+.env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +28,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Vite output
+dist
+
+# TypeScript
+*.tsbuildinfo
